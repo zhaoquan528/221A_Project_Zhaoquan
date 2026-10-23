@@ -1,0 +1,198 @@
+---
+title: "data-processing-script_zhaoquanwang"
+output: html_document
+date: "2026-10-22"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+```
+
+##Load the package and data
+
+```{r load message = FALSE}
+#load package
+library(codebook)
+
+#import data
+raw <- read.csv("C:\\PSY221A\\Data\\Raw Data\\data_doctored.csv")
+
+```
+
+## Hypothesis 1: Controlling for age, level of education, and political views, being a female (categorical IV) predicts higher intensity of love feelings than the other genders at birth (Male and intersex)
+
+##Hypothesis 2: Controlling for age, level of education, gender/sex at birth, and political views, higher willingness to marry a partner without romantic love (continuous IV) predicts lower relationship satisfaction. 
+
+```{r}
+#make data with the variables I need in the two hypotheses
+
+data <- raw[,c("ResponseId", "Sex_birth", "Relationship_status", "Age", "cot_educ",
+               "cot_politics", "Love_how_much_1", "Love_would_you_marry_1",
+               "prqc_1", "prqc_2", "prqc_3")]
+
+dim(data)
+
+```
+
+##Check particpants IDs
+
+```{r}
+#count NA
+sum(is.na(data$ResponseId))
+
+#count blank
+sum(data$ResponseId == "", na.rm = T)
+
+#count duplicates
+sum(duplicated(data$ResponseId))
+
+#inspect records with missing or blank IDs
+missingID <- which(is.na(data$ResponseId))
+print(data[missingID, ])
+
+#remove the known empty record with no ID
+data <- data[!is.na(data$ResponseId), ]
+
+```
+
+
+##Binary Code sex at birth: 1 = Female, 0 = TheOtherSex Male and Intersex
+```{r}
+data$Sex_birth <- ifelse(data$Sex_birth %in% c(0, 1, 2),
+                         data$Sex_birth, NA)
+data$Gender_new <- ifelse(data$Sex_birth == 1, 1, 0)
+
+
+#Turn binary sex_birth into factors with labels
+data$Gender_new <- factor(data$Gender_new,
+                          levels = c(0,1),
+                          labels = c("Male_Intersex","Female"))
+
+table(data$Gender_new, useNA = "ifany")
+
+```
+
+
+## Validate the other controlling variables: age, level of education, political beliefs
+```{r}
+summary(data[, c("Age", "cot_educ", "cot_politics")])
+
+table(data$cot_educ, useNA = "ifany")
+table(data$cot_politics, useNA = "ifany")
+
+```
+
+##Check the IV and DV variables in the two hypotheses: intensity of love feelings, willingness to marry a partner without romantic love, relationship satisfaction
+
+```{r}
+#Check values for the non-combined variables
+summary(data[, c("Love_how_much_1", "Love_would_you_marry_1")])
+
+#Check values for the combined variables
+summary(data[, c("prqc_1", "prqc_2", "prqc_3")])
+
+```
+
+
+##Calculate avg relationship satisfaction
+```{r}
+#Calculate the mean of all three items, if missing one item or two, use the remaining items to calculate their average relationship satisfaction.
+data$satisfaction <- rowMeans(data[, c("prqc_1", "prqc_2", "prqc_3")],
+                             na.rm = TRUE)
+
+summary(data$satisfaction)
+
+```
+
+## Get variables for H1 and H2
+```{r}
+#Variables for H1:
+h1Data <- data[, c("ResponseId", "Gender_new", "Love_how_much_1",
+                   "Age", "cot_educ", "cot_politics")]
+
+#only include item with no missing value
+h1Data <- h1Data[complete.cases(h1Data), ]
+
+#Keep those participants in relationship for H2
+relData <- data[data$Relationship_status %in% c(1, 2, 3), ]
+
+h2Data <- relData[, c("ResponseId", "Love_would_you_marry_1",
+                      "satisfaction", "Age", "cot_educ",
+                      "Gender_new", "cot_politics")]
+
+h2Data <- h2Data[complete.cases(h2Data), ]
+
+
+```
+
+## Check final tables
+```{r}
+#Check H1 data
+dim(h1Data)
+str(h1Data)
+head(h1Data)
+colSums(is.na(h1Data))
+sum(duplicated(h1Data$ResponseId))
+table(h1Data$Gender_new)
+range(h1Data$Love_how_much_1) 
+
+#Check H2 data
+dim(h2Data)
+str(h2Data)
+head(h2Data)
+colSums(is.na(h2Data))
+sum(duplicated(h2Data$ResponseId))
+table(h2Data$Gender_new)
+range(h2Data$Love_would_you_marry_1) 
+range(h2Data$satisfaction)
+```
+
+## Add labels and generate codebooks
+
+```{r}
+#Add descriptions for H1:
+var_label(h1Data) <- c(
+  "Unique participant ID",
+  "Sex at birth: Female vs. Male/Intersex; coded 1=Female, 0=Male/Intersex before conversion to factor",
+  "Love intensity: 0=Very little, 100=Very much",
+  "Age in years: 18–90",
+  "Education: 1=None, 2=Primary, 3=Secondary, 4=High school/technical college, 5=Bachelor, 6=Master, 7=PhD/MD/JD or equivalent",
+  "Political views: 1=Far left, 2=Center left, 3=Center, 4=Center right, 5=Far right"
+)
+
+#Add description for H2:
+var_label(h2Data) <- c(
+  "Unique participant ID",
+  "Willingness to marry without romantic love: 0=Definitely would not marry, 100=Definitely would marry",
+  "Relationship satisfaction: mean of available prqc_1–3 responses; 1=Not at all, 7=Extremely; at least one valid response required; no reverse coding",
+  "Age in years: 18–90",
+  "Education: 1=None, 2=Primary, 3=Secondary, 4=High school/technical college, 5=Bachelor, 6=Master, 7=PhD/MD/JD or equivalent",
+  "Sex at birth: Female vs. Male/Intersex; coded 1=Female, 0=Male/Intersex before conversion to factor",
+  "Political views: 1=Far left, 2=Center left, 3=Center, 4=Center right, 5=Far right"
+)
+
+#Generate codebooks for H1 and H2
+compact_codebook(h1Data)
+compact_codebook(h2Data)
+
+```
+
+## Save the final tables
+
+```{r}
+dir.create("data/processed_data", recursive = TRUE, showWarnings = FALSE)
+
+
+write.csv(h1Data, "data/processed_data/h1Data.csv", row.names = FALSE)
+write.csv(h2Data, "data/processed_data/h2Data.csv", row.names = FALSE)
+
+
+h1Saved <- read.csv("data/processed_data/h1Data.csv")
+h2Saved <- read.csv("data/processed_data/h2Data.csv")
+
+dim(h1Saved)
+dim(h2Saved)
+```
+
