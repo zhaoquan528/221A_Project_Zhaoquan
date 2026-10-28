@@ -1,0 +1,109 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+##Load package
+
+```{r load package}
+#load package
+library(ggplot2)
+library(ggrain)
+
+
+```
+
+## Hypothesis
+Hypothesis 1: Controlling for age, level of education, and political views, being a female (categorical IV) predicts higher intensity of love feelings than the other genders at birth (Male and intersex)
+
+Hypothesis 2: Controlling for age, level of education, gender/sex at birth, and political views, higher willingness to marry a partner without romantic love (continuous IV) predicts lower relationship satisfaction. 
+
+##Load Data
+```{r load data}
+#load processed data
+
+h1Data <- read.csv("C:\\PSY221A\\Data\\processed_data\\h1Data.csv")
+h2Data <- read.csv("C:\\PSY221A\\Data\\processed_data\\h2Data.csv")
+
+#set categorical variable
+h1Data$Gender_new <- factor(h1Data$Gender_new,
+                            levels = c("Male_Intersex", "Female"))
+#Check the dataset
+dim(h1Data)
+dim(h2Data)
+table(h1Data$Gender_new)
+
+```
+
+
+## H1 - Violin Plot (with Box Plot)
+
+```{r}
+h1viol <- ggplot(data = h1Data, aes(x = Gender_new,
+                                    y = Love_how_much_1,
+                                    fill = Gender_new))+
+  labs(x = "Gender assigned at birth",
+       y = "Intensity of love feelings",
+       title = "Intensity of love feeling by gender",
+       fill = "Sex")+
+  theme_gray(base_size = 8) +
+  geom_violin() +
+  geom_boxplot(width = .15)
+
+h1viol
+
+```
+
+
+## H1 - Box Plot 
+```{r}
+h1Box <- ggplot(data = h1Data, aes(x = Gender_new,
+                                   y = Love_how_much_1,
+                                   fill = Gender_new)) +
+  geom_boxplot() +
+  labs(x = "Sex assigned at birth",
+       y = "Love intensity (0–100)",
+       title = "Love intensity by sex assigned at birth",
+       fill = "Sex") +
+  theme_gray(base_size = 8)
+
+h1Box
+```
+
+
+## H1 - Raincloud Plot
+
+```{r}
+h1rain <- ggplot(data = h1Data, aes(x = Gender_new,
+                                    y = Love_how_much_1,
+                                    fill = Gender_new,
+                                    color = Gender_new)) +
+  labs(x = "Sex assigned at birth",
+       y = "Love intensity (0–100)",
+       title = "Love intensity by sex assigned at birth",
+       fill = "Gender_new") +
+  geom_rain(alpha = .5) +
+  theme_minimal(base_line_size = 8)
+
+h1rain
+
+```
+
+## H2 - Scatter Plots + Smooth Line
+
+```{r}
+h2Line <- ggplot(data = h2Data, aes(x = Love_would_you_marry_1,
+                                      y = satisfaction)) +
+  geom_jitter(width = .12, height = .04, alpha = .08, size = .6) +
+  labs(x = "willingness to marry a partner without romantic love",
+       y = "relationship satisfaction",
+       title = "Relationship between willingness to marry without love and relationship satisfaction") +
+  theme_minimal(base_size = 8) +
+  geom_smooth(method = "lm")
+
+h2Line
+```
+
+
+P.S.: Supposedly a good data visualization that fits both my H1 and H2 is multi-variable linear regression plot. But that will require me to use "lm()" function to generate the models and then visualize it and also it will be very complex to generate. So far these graphs here will be a good first glance of visualization based on what we have learned so far.
