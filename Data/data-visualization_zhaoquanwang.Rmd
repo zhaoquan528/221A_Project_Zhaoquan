@@ -23,8 +23,8 @@ Hypothesis 2: Controlling for age, level of education, gender/sex at birth, and 
 ```{r load data}
 #load processed data
 
-h1Data <- read.csv("C:\\PSY221A\\Data\\processed_data\\h1Data.csv")
-h2Data <- read.csv("C:\\PSY221A\\Data\\processed_data\\h2Data.csv")
+h1Data <- read.csv("processed_data\\h1Data.csv")
+h2Data <- read.csv("processed_data\\h2Data.csv")
 
 #set categorical variable
 h1Data$Gender_new <- factor(h1Data$Gender_new,
@@ -98,12 +98,49 @@ h2Line <- ggplot(data = h2Data, aes(x = Love_would_you_marry_1,
   geom_jitter(width = .12, height = .04, alpha = .08, size = .6) +
   labs(x = "willingness to marry a partner without romantic love",
        y = "relationship satisfaction",
-       title = "Relationship between willingness to marry without love and relationship satisfaction") +
-  theme_minimal(base_size = 8) +
+       title = "Marry without love and Relationship Satisfaction") +
   geom_smooth(method = "lm")
 
 h2Line
 ```
 
 
-P.S.: Supposedly a good data visualization that fits both my H1 and H2 is multi-variable linear regression plot. But that will require me to use "lm()" function to generate the models and then visualize it and also it will be very complex to generate. So far these graphs here will be a good first glance of visualization based on what we have learned so far.
+P.S.: Supposedly a good data visualization that fits both my H1 and H2 is a multi-variable linear regression plot. But that will require me to use "lm()" function to generate the models and then visualize it and also it will be very complex to generate. So far these graphs here will be a good first glance of visualization based on what we have learned so far.
+
+##H2 Multiple Linear Regression Model
+
+```{r}
+h2Model <- lm(satisfaction ~ Love_would_you_marry_1 + Age +
+                cot_educ + Gender_new + cot_politics, data = h2Data)
+
+pred <- data.frame(
+  Love_would_you_marry_1 = 0:100,
+  Age = mean(h2Data$Age),
+  cot_educ = mean(h2Data$cot_educ),
+  cot_politics = mean(h2Data$cot_politics),
+  Gender_new = "Female"
+)
+
+
+# Predictions and confidence intervals from the original regression
+pred <- cbind(
+  pred,
+  predict(h2Model, newdata = pred, interval = "confidence")
+)
+
+ggplot(pred, aes(x = Love_would_you_marry_1, y = fit)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr),
+              fill = "blue", alpha = .2) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_jitter(alpha = 0.2)+
+  labs(
+    x = "Willingness to marry without love (0–100)",
+    y = "Predicted relationship satisfaction (1–7)",
+    title = "Willingness to marry without love and satisfaction",
+    subtitle = "Female; other controls held at their means",
+    caption = "Shaded band = 95% confidence interval. Y-axis is zoomed."
+  ) +
+  theme_minimal(base_size = 12)
+
+```
+
