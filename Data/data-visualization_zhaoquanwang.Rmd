@@ -31,8 +31,8 @@ Hypothesis 2: Controlling for age, level of education, gender/sex at birth, and 
 # Forward slashes (/) work in R on Windows and macOS.
 ###  End of comment ###
 
-h1Data <- read.csv("processed_data\\h1Data.csv")
-h2Data <- read.csv("processed_data\\h2Data.csv")
+h1Data <- read.csv("Data/processed_data/h1Data.csv")
+h2Data <- read.csv("Data/processed_data/h2Data.csv")
 
 #set categorical variable
 h1Data$Gender_new <- factor(h1Data$Gender_new,
@@ -85,8 +85,7 @@ h1Box
 ```{r}
 h1rain <- ggplot(data = h1Data, aes(x = Gender_new,
                                     y = Love_how_much_1,
-                                    fill = Gender_new,
-                                    color = Gender_new)) +
+                                    fill = Gender_new)) +
   labs(x = "Sex assigned at birth",
        y = "Love intensity (0–100)",
        title = "Love intensity by sex assigned at birth",
