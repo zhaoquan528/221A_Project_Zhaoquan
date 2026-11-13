@@ -23,6 +23,14 @@ Hypothesis 2: Controlling for age, level of education, gender/sex at birth, and 
 ```{r load data}
 #load processed data
 
+###JK: Generate the processed CSVs and use paths that work from the project folder. ###
+# The CSVs are not in the submitted repository, and these Windows backslash paths do not work on macOS.
+# After rerunning your wrangling script and saving its outputs to Data/processed_data, use:
+# h1Data <- read.csv("Data/processed_data/h1Data.csv")
+# h2Data <- read.csv("Data/processed_data/h2Data.csv")
+# Forward slashes (/) work in R on Windows and macOS.
+###  End of comment ###
+
 h1Data <- read.csv("processed_data\\h1Data.csv")
 h2Data <- read.csv("processed_data\\h2Data.csv")
 
@@ -110,6 +118,10 @@ P.S.: Supposedly a good data visualization that fits both my H1 and H2 is a mult
 ##H2 Multiple Linear Regression Model
 
 ```{r}
+###JK: We may not cover analyses with control variables in this course, so you can leave out this additional adjusted-model section.###
+# If you keep it, education and political views are categorical here. Setting them to their numeric means can create nonexistent categories; choose actual categories for the prediction data instead.
+###  End of comment ###
+
 h2Model <- lm(satisfaction ~ Love_would_you_marry_1 + Age +
                 cot_educ + Gender_new + cot_politics, data = h2Data)
 
