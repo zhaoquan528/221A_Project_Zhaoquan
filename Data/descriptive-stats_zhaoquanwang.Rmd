@@ -6,6 +6,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+###JK: Good work! Nothing to revise :) ###
+
 ## 1. Load the processed data
 ```{r}
 #install packages
