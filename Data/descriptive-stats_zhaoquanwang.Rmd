@@ -1,0 +1,114 @@
+---
+title: "descriptive-stats_zhaoquanwang"
+output: html_document
+date: "2026-11-13"
+editor_options: 
+  chunk_output_type: console
+---
+
+## 1. Load the processed data
+```{r}
+#install packages
+library("psych")
+
+#load data: I change my r project directory to processed_data folder, given that I changed to use my computer instead of the renting one.
+h1Data <- read.csv("h1Data.csv")
+h2Data <- read.csv("h2Data.csv")
+```
+
+## 2. Check Distribution
+
+```{r histogram}
+h1Data$Gender_new <- factor(h1Data$Gender_new,
+                           levels = c("Male_Intersex", "Female"))
+
+table(h1Data$Gender_new, useNA = "ifany")
+
+hist(h1Data$Love_how_much_1,
+     main = "Distribution of love intensity",
+     xlab = "Love intensity (0–100)")
+
+hist(h2Data$Love_would_you_marry_1,
+     main = "Distribution of willingness to marry without love",
+     xlab = "Willingness to marry without love (0–100)")
+
+hist(h2Data$satisfaction,
+     main = "Distribution of relationship satisfaction",
+     xlab = "Relationship satisfaction (1–7)")
+
+```
+
+## 3. Check mean and IQR and ranges
+
+```{r individual_stats}
+#intense of love
+mean(h1Data$Love_how_much_1, na.rm = TRUE)
+median(h1Data$Love_how_much_1, na.rm = TRUE)
+range(h1Data$Love_how_much_1, na.rm = TRUE)
+IQR(h1Data$Love_how_much_1, na.rm = TRUE)
+
+#marry without love
+mean(h2Data$Love_would_you_marry_1, na.rm = TRUE)
+median(h2Data$Love_would_you_marry_1, na.rm = TRUE)
+range(h2Data$Love_would_you_marry_1, na.rm = TRUE)
+IQR(h2Data$Love_would_you_marry_1, na.rm = TRUE)
+
+#relationship satisfaction
+mean(h2Data$satisfaction, na.rm = TRUE)
+median(h2Data$satisfaction, na.rm = TRUE)
+table(h2Data$satisfaction, useNA = "ifany")
+range(h2Data$satisfaction, na.rm = TRUE)
+IQR(h2Data$satisfaction, na.rm = TRUE)
+
+
+```
+
+## 4. Standardize a variable
+
+```{r standardize}
+h2Data$satisfaction_z <- as.numeric(scale(h2Data$satisfaction))
+
+mean(h2Data$satisfaction_z, na.rm = TRUE)
+sd(h2Data$satisfaction_z, na.rm = TRUE)
+
+```
+
+## 5. Covariance and correlation
+
+```{r association}
+cov(h2Data$Love_would_you_marry_1, h2Data$satisfaction,
+    use = "complete.obs")
+
+cor(h2Data$Love_would_you_marry_1, h2Data$satisfaction,
+    use = "complete.obs")
+
+corData <- h2Data[, c("Love_would_you_marry_1", "satisfaction")]
+
+cor(corData, use = "complete.obs")
+```
+
+
+## 6. Several statistics at once
+
+```{r combined summaries}
+summary(h1Data$Love_how_much_1)
+
+psych::describe(h1Data$Love_how_much_1)
+
+psych::describeBy(h1Data$Love_how_much_1,
+                  group = h1Data$Gender_new)
+
+summary(corData)
+
+psych::describe(corData)
+```
+
+
+
+
+
+
+
+
+
+
