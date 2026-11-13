@@ -17,21 +17,7 @@ editor_options:
 library(codebook)
 
 #import data
-
-###JK: Please use a project-relative input path so the script can run on another computer. ###
-# The current C: path points to a folder on your own computer.
-# With the project folder as the working directory, replace the line below with:
-# raw <- read.csv("Data/Raw Data/data_doctored.csv")
-# Use Data with a capital D in the save and read-back paths at the end as well, to match your actual folder name.
-# For example:
-# dir.create("Data/processed_data", recursive = TRUE, showWarnings = FALSE)
-# write.csv(h1Data, "Data/processed_data/h1Data.csv", row.names = FALSE)
-# write.csv(h2Data, "Data/processed_data/h2Data.csv", row.names = FALSE)
-# h1Saved <- read.csv("Data/processed_data/h1Data.csv")
-# h2Saved <- read.csv("Data/processed_data/h2Data.csv")
-###  End of comment ###
-
-raw <- read.csv("C:\\PSY221A\\Data\\Raw Data\\data_doctored.csv")
+raw <- read.csv("Data\\Raw Data\\data_doctored.csv")
 
 ```
 
@@ -126,13 +112,12 @@ summary(data$satisfaction)
 h1Data <- data[, c("ResponseId", "Gender_new", "Love_how_much_1",
                    "Age", "cot_educ", "cot_politics")]
 
-###JK: Preparing potential control variables is good practice, but we may not cover using them in analyses in this course. ###
-# complete.cases(h1Data) also excludes people missing age, education, or political views.
-# If you do not use these controls for you final analysis, you can keep people who answered the main variables even if their control-variable responses are missing.
-###  End of comment ###
-
 #only include item with no missing value
-h1Data <- h1Data[complete.cases(h1Data), ]
+h1Data <- h1Data[
+  complete.cases(h1Data[, c("ResponseId", "Gender_new", "Love_how_much_1")]),
+]
+
+
 
 #Keep those participants in relationship for H2
 relData <- data[data$Relationship_status %in% c(1, 2, 3), ]
@@ -141,7 +126,9 @@ h2Data <- relData[, c("ResponseId", "Love_would_you_marry_1",
                       "satisfaction", "Age", "cot_educ",
                       "Gender_new", "cot_politics")]
 
-h2Data <- h2Data[complete.cases(h2Data), ]
+h2Data <- h2Data[
+  complete.cases(h2Data[, c("ResponseId", "Love_would_you_marry_1", "satisfaction")]),
+]
 
 
 ```
@@ -201,15 +188,15 @@ compact_codebook(h2Data)
 ## Save the final tables
 
 ```{r}
-dir.create("data/processed_data", recursive = TRUE, showWarnings = FALSE)
+dir.create("Data/processed_data", recursive = TRUE, showWarnings = FALSE)
 
 
-write.csv(h1Data, "data/processed_data/h1Data.csv", row.names = FALSE)
-write.csv(h2Data, "data/processed_data/h2Data.csv", row.names = FALSE)
+write.csv(h1Data, "Data/processed_data/h1Data.csv", row.names = FALSE)
+write.csv(h2Data, "Data/processed_data/h2Data.csv", row.names = FALSE)
 
 
-h1Saved <- read.csv("data/processed_data/h1Data.csv")
-h2Saved <- read.csv("data/processed_data/h2Data.csv")
+h1Saved <- read.csv("Data/processed_data/h1Data.csv")
+h2Saved <- read.csv("Data/processed_data/h2Data.csv")
 
 dim(h1Saved)
 dim(h2Saved)
