@@ -12,6 +12,7 @@ editor_options:
 library("psych")
 
 #load data: I change my r project directory to processed_data folder, given that I changed to use my computer instead of the renting one.
+
 h1Data <- read.csv("h1Data.csv")
 h2Data <- read.csv("h2Data.csv")
 ```
