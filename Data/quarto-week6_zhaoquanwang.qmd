@@ -1,0 +1,11 @@
+---
+title: "Week 6 Lab Assignment"
+author: "Zhaoquan Harold Wang"
+format: 
+  html:
+    toc: true
+    code-fold: true
+execute:
+  echo: true
+editor: visual
+---
