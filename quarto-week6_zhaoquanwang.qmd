@@ -1,0 +1,110 @@
+---
+title: "Week 6 Lab Assignment"
+author: "Zhaoquan Harold Wang"
+format: 
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  echo: true
+---
+
+```{r}
+#| label: load-data
+#| include: false
+
+library(ggplot2)
+library(ggrain)
+
+h1Data <- read.csv("Data/processed_data/h1Data.csv")
+h2Data <- read.csv("Data/processed_data/h2Data.csv")
+
+h1Data$Gender_new <- factor(
+  h1Data$Gender_new,
+  levels = c("Male_Intersex", "Female")
+)
+```
+
+## Hypothesis 1:
+
+Females report higher love intensity than males and intersex respondents combined.
+
+### Variables and descriptive statistics
+
+-   **Binary Sex at birth (`Gender_new`):** A categorical variable with two groups: Male and intersex, female.
+-   **Intensity of Love Feelings (`Love_how_much_1`):** A single item asking "How much do you love this person?" Responses range from 0 (Very little) to 100 (Very much)
+
+```{r}
+#| label: h1-descriptives
+# Count respondents in each group.
+table(h1Data$Gender_new)
+
+# Summarize attractiveness points separately for each group.
+by(h1Data$Love_how_much_1, h1Data$Gender_new, summary)
+```
+
+### Graph
+
+@fig-love_intensity shows the distribution of points by binary sex at birth. The half-violin shows the shape of the distribution, the box summarize the median and quartiles, and the dots represent individual responses.
+
+```{r}
+#| label: fig-love_intensity
+#| fig-cap: "Points allocated to people's love intensity, by binary sex at birth."
+#| fig-width: 8
+#| fig-height: 5
+
+ggplot(h1Data, aes(x = Gender_new, y = Love_how_much_1,
+                   fill = Gender_new)) +
+  geom_rain(alpha = 0.5, point.args = list(alpha = 0.04, size = 0.6)) +
+  labs(x = "Binary Sex at birth", y = "Points allocated to people's love intensity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Hypothesis 2:
+
+Greater willingness to marry without romantic love is associated with lower relationship satisfaction.
+
+### Variables and descriptive statistics
+
+-   **Matrimonial Directedness/Marry Without Love(`Love_would_you_marry_1`):** A single item asking respondents to imagine being outside a committed relationship and meeting someone who has all their desired qualities but whom they do not love. Responses range from 0 (I would definitely not marry this person) to 100 (I would definitely marry this person)
+
+```{=html}
+<!-- -->
+```
+-   **Relationship satisfaction (`satisfaction`):** The mean of available responses to `prqc_1`, `prqc_2`, and `prqc_3`, which assess how satisfied, content, and happy respondents are with their relationship. Each item ranges from 1 (Not at all) to 7 (Extremely). Higher mean scores indicate greater relationship satisfaction.
+
+```{r}
+#| label: h2-descriptives
+summary(h2Data[, c("Love_would_you_marry_1", "satisfaction")])
+
+```
+
+### Graph
+
+@fig-satisfaction shows the relationship between marry without love and relationship satisfaction. Points are jittered to make overlapping responses easier to see; the recorded scores are unchanged. The line summarizes the linear trend.
+
+```{r}
+#| label: fig-satisfaction
+#| fig-cap: "Confidence in finding a new partner and relationship commitment."
+#| fig-width: 8
+#| fig-height: 5
+
+ggplot(h2Data, aes(x = Love_would_you_marry_1, y = satisfaction)) +
+  geom_jitter(width = .12, height = .04, alpha = .04, size = .6) +
+  geom_smooth(method = "lm") +
+  labs(x = "Marry Without Love (0–100)",
+       y = "Relationship Satisfaction (1–7)") +
+  theme_minimal()
+```
+
+### Observed trend
+
+```{r}
+#| label: correlation
+r <- cor(h2Data$Love_would_you_marry_1, h2Data$satisfaction, use = "complete.obs")
+round(r, 2) 
+```
+
+The correlation was `-0.06`, indicating a very weak negative association. Respondents who have greater willingness to marry without love tend to report lower relationship satisfaction.
