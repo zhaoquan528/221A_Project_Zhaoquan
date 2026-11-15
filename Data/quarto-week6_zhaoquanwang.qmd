@@ -5,7 +5,23 @@ format:
   html:
     toc: true
     code-fold: true
+    embed-resources: true
 execute:
   echo: true
-editor: visual
 ---
+
+```{r}
+#| label: load-data
+#| include: false
+
+library(ggplot2)
+library(ggrain)
+
+h1Data <- read.csv("Data/processed_data/h1Data.csv")
+h2Data <- read.csv("Data/processed_data/h2Data.csv")
+
+h1Data$Gender_new <- factor(
+  h1Data$Gender_new,
+  levels = c("Male_Intersex", "Female")
+)
+```
