@@ -10,6 +10,13 @@ execute:
   echo: true
 ---
 
+###JK: The report renders successfully; update the H2 caption and publish the HTML. ###
+# Change the H2 fig-cap to "Willingness to marry without love and relationship satisfaction" so it matches the graph.
+# I could not find a published GitHub Pages report on November 19. Render this QMD, copy the HTML to docs/index.html, and push it.
+# Then choose Settings > Pages > Deploy from a branch > main > /docs > Save.
+###  End of comment ###
+
+
 ```{r}
 #| label: load-data
 #| include: false
