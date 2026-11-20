@@ -10,6 +10,9 @@ execute:
   echo: true
 ---
 
+###JK: Good work! Nothing to revise :) ###
+
+
 ```{r}
 #| label: load-data
 #| include: false
@@ -87,7 +90,7 @@ summary(h2Data[, c("Love_would_you_marry_1", "satisfaction")])
 
 ```{r}
 #| label: fig-satisfaction
-#| fig-cap: "Confidence in finding a new partner and relationship commitment."
+#| fig-cap: "Willingness to marry without love and relationship satisfaction"
 #| fig-width: 8
 #| fig-height: 5
 
